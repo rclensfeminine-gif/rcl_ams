@@ -473,17 +473,47 @@ def pipeline_nettoyage_match(df: pd.DataFrame, t_match: str = None, s_match: str
     return df
 
 
-##Importer les chemins de tous les fichiers matchs
-def get_all_chemin_match(chemin: Union[str, None]=None) -> list:
+##Importer les chemins de tous les fichiers matchs en local !!!!
+#def get_all_chemin_match(chemin: Union[str, None]=None) -> list:
+#    if chemin is None:
+#        liste_chemin = os.getcwd().split('\\')
+#        chemin = "\\".join(liste_chemin) + "\\data\\match\\"
+#    fichiers = os.listdir(chemin)
+#    total = []
+#    for i in fichiers:
+#        final_chemin = chemin + i
+#        total.append(final_chemin)
+#    return total
+
+##Importer les chemins de tous les fichiers matchs développement application
+def get_all_chemin_match(chemin: Union[str, None] = None) -> list:
+    """
+    Récupère les chemins de tous les fichiers dans le dossier 'data/match'.
+    Version compatible Windows/Linux (Streamlit Cloud).
+    """
     if chemin is None:
-        liste_chemin = os.getcwd().split('\\')
-        chemin = "\\".join(liste_chemin) + "\\data\\match\\"
-    fichiers = os.listdir(chemin)
-    total = []
-    for i in fichiers:
-        final_chemin = chemin + i
-        total.append(final_chemin)
-    return total
+        # Construction propre du chemin relatif à la racine du projet
+        # os.path.join utilise / sur Linux et \ sur Windows
+        root_dir = os.getcwd()
+        chemin = os.path.join(root_dir, "data", "match")
+
+    # Sécurité : vérifie si le dossier existe avant de lister son contenu
+    if not os.path.exists(chemin):
+        print(f"Attention : Le dossier {chemin} n'existe pas.")
+        return []
+
+    try:
+        fichiers = os.listdir(chemin)
+        # On filtre pour ne prendre que des fichiers (évite les dossiers cachés .DS_Store etc)
+        total = [
+            os.path.join(chemin, f) 
+            for f in fichiers 
+            if os.path.isfile(os.path.join(chemin, f))
+        ]
+        return total
+    except Exception as e:
+        print(f"Erreur lors de la lecture du dossier : {e}")
+        return []
 
 def recuperer_info_match_fichier(path_fichier: str) -> str:
     split = path_fichier.rsplit('.csv')
