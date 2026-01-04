@@ -1,0 +1,31 @@
+[
+    {
+        "id": "50f492d0-9e63-4178-b96d-11baf6624c08",
+        "Joueuse": "Madelynn ANDERSON",
+        "Jour": "Mardi",
+        "Heure": "9:15",
+        "Type": "soin",
+        "Détails": "",
+        "created_at": "2025-12-11T14:43:24.532108",
+        "player_name": "Madelynn ANDERSON"
+    },
+    {
+        "id": "2347d523-207f-4eab-add2-c65faf856aed",
+        "Joueuse": "Alizée MEREAU",
+        "Jour": "Mardi",
+        "Heure": "9:30",
+        "Type": "Soin",
+        "Détails": "",
+        "created_at": "2025-12-11T14:44:12.187637"
+    },
+    {
+        "id": "86fa9ac0-75d2-43d4-a0f9-5bf57afdf1b6",
+        "player_name": "Carla POLITO",
+        "Jour": "Mardi",
+        "Heure": "9:00",
+        "Type": "Vidéo",
+        "Détails": "",
+        "created_at": "2025-12-12T18:00:02.507138",
+        "Joueuse": "Carla POLITO"
+    }
+]
