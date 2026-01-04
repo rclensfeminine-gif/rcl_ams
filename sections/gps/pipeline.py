@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import os
 import json
-import plotly.express as px
 from datetime import date, timedelta
 from typing import Union
 from sections.constantes import DICT_REPLACE_COLS, LIST_ORGANISATION_COLS_MATCH, cols_ref_match, ONGLET_GPS_SAISON, ONGLET_GPS_TYPE_MATCH, cols_joueuses, agg_dict_indiv, agg_dict_semaine
@@ -46,16 +45,44 @@ def pipeline_nettoyage(df: pd.DataFrame, j_semaine: str = None, s_seance: str = 
     df = parse_date(df=df)
     return df
 
-#Importer les chemins de tous les fichiers
-def get_all_chemin(chemin: Union[str, None]=None) -> list:
+#Importer les chemins de tous les fichiers en local !!!!
+#def get_all_chemin(chemin: Union[str, None]=None) -> list:
+#    if chemin is None:
+#        liste_chemin = os.getcwd().split('\\')
+#        chemin = "\\".join(liste_chemin) + "\\data\\séance\\"
+#    fichiers = os.listdir(chemin)
+#    total = []
+#    for i in fichiers:
+#        final_chemin = chemin + i
+#        total.append(final_chemin)
+#    return total
+
+#Importer les chemins de tous les fichiers développement application
+def get_all_chemin(chemin: Union[str, None] = None) -> list:
+    """
+    Récupère les chemins de tous les fichiers dans le dossier spécifié.
+    Fonctionne sur Windows (local) et Linux (Streamlit Cloud).
+    """
     if chemin is None:
-        liste_chemin = os.getcwd().split('\\')
-        chemin = "\\".join(liste_chemin) + "\\data\\séance\\"
+        # On récupère le chemin du dossier racine du projet de manière propre
+        root_dir = os.getcwd()
+        # os.path.join gère automatiquement les / ou \ selon le système
+        chemin = os.path.join(root_dir, "data", "séance")
+
+    # Vérification si le dossier existe pour éviter le crash
+    if not os.path.exists(chemin):
+        # On peut logger l'erreur ou retourner une liste vide pour ne pas faire crash l'app
+        print(f"Erreur : Le dossier {chemin} est introuvable.")
+        return []
+
     fichiers = os.listdir(chemin)
     total = []
+    
     for i in fichiers:
-        final_chemin = chemin + i
+        # On utilise encore os.path.join ici pour joindre le fichier au dossier
+        final_chemin = os.path.join(chemin, i)
         total.append(final_chemin)
+        
     return total
 
 def recuperer_jour_fichier(path_fichier: str) -> str:
