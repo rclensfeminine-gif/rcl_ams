@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 import os
+import json
+from google.cloud import firestore
+from google.oauth2 import service_account
 from datetime import datetime
 from sections.menu.menu import custom_sidebar_menu
 from sections.constantes import cols_cumul_sum as initial_cols_cumul_sum
@@ -263,3 +266,50 @@ else:
     st.error("❌ Échec de la prescription : Aucune joueuse n'a pu être calculée. Veuillez vérifier les avertissements ci-dessus.")
 
 #st.dataframe(df_meilleur_match)
+
+def init_connection():
+    """Initialise la connexion à Firestore en utilisant les Secrets de Streamlit."""
+    try:
+        # On récupère les secrets au format dictionnaire
+        key_dict = dict(st.secrets["firestore"])
+        
+        # On crée les credentials
+        creds = service_account.Credentials.from_service_account_info(key_dict)
+        
+        # On initialise le client Firestore
+        return firestore.Client(credentials=creds, project=key_dict['project_id'])
+    except Exception as e:
+        st.error(f"Erreur d'initialisation : {e}")
+        return None
+
+st.title("🚀 Test de connexion Firestore")
+
+db = init_connection()
+
+if db:
+    st.success("Connexion réussie aux Secrets et à Google Cloud !")
+    
+    # Test de lecture/écriture simple
+    st.subheader("Vérification des données")
+    
+    # Bouton pour tester l'écriture
+    if st.button("Écrire un document de test"):
+        doc_ref = db.collection("test_collection").document("test_doc")
+        doc_ref.set({
+            "status": "Connecté !",
+            "message": "Bravo, tes secrets fonctionnent parfaitement.",
+            "timestamp": firestore.SERVER_TIMESTAMP
+        })
+        st.info("Document 'test_doc' créé dans la collection 'test_collection'.")
+
+    # Affichage des documents existants (si disponibles)
+    try:
+        docs = db.collection("test_collection").stream()
+        st.write("Documents trouvés dans 'test_collection' :")
+        for doc in docs:
+            st.json(doc.to_dict())
+    except Exception as e:
+        st.warning(f"Impossible de lire la collection (elle est peut-être vide) : {e}")
+else:
+    st.error("La connexion a échoué. Vérifie le format de ta 'private_key' dans les Secrets.")
+    st.info("Astuce : La clé doit commencer par `-----BEGIN PRIVATE KEY-----` et finir par `-----END PRIVATE KEY-----\\n`.")
